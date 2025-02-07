@@ -1,0 +1,46 @@
+section {
+  width: 100vw;  /* Full width of viewport */
+  height: 100vh; /* Full height of viewport */
+  padding: 60px;
+  border-bottom: 2px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;  /* Positioning context for content */
+}
+
+#section1 {
+  background-color: #f1f1f1; /* Solid background for section1 */
+  color: #fff;
+}
+
+#section2, #section3, #section4, #section5, #section6 {
+  background-image: url('/images/bgf.jpg'); /* Apply the same background image */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;  /* Ensure background stays fixed while scrolling */
+  color: white;
+  position: relative;  /* Position content correctly */
+}
+
+#section2::before, #section3::before, #section4::before, #section5::before, #section6::before {
+  content: "";  /* Creates an empty pseudo-element */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;  /* Inherit the background image from the parent */
+  z-index: -1;  /* Place the pseudo-element behind the content */
+}
+
+h2 {
+  color: #4a4a4a;
+  font-size: 2rem;
+}
+
+p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
