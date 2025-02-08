@@ -1,5 +1,10 @@
 {
-<<<<<<< HEAD
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "browser": {
+    "crypto": false
+  },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -11,17 +16,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.9",
     "react-router-dom": "^7.1.5",
-    "web-vitals": "^2.1.4"
-  }
-}
-=======
-  "name": "frontend",
-  "version": "0.1.0",
-  "private": true,
-  "browser": {
-    "crypto": false
-  },
-  "dependencies": {
+    "web-vitals": "^2.1.4",
     "boxicons": "^2.1.4",
     "cra-template": "1.2.0",
     "crypto": "^1.0.1",
@@ -30,7 +25,6 @@
     "razorpay": "^2.9.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.1.5",
     "react-scripts": "5.0.1"
   },
   "scripts": {
@@ -58,4 +52,5 @@
     ]
   }
 }
->>>>>>> 0bbd9d83 (first commit)
+
+

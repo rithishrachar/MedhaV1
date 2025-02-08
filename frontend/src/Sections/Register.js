@@ -5,6 +5,7 @@ import axios from 'axios';
 
 const Register = () => {
   const [paymentSuccess, setPaymentSucces] = useState(false);
+  const [registeredDetails, setRegisteredDetails] = useState();
   console.log(paymentSuccess);
   const [events, setEvents] = useState({
     coding: false,
@@ -94,6 +95,7 @@ const Register = () => {
       }
     });
 
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -101,21 +103,21 @@ const Register = () => {
   //this is for the pay button
   const paymentHandler = async (e) => {
 
-  
+
     //total amount calculation
     let totalParticipants = 0;
     Object.keys(eventDetails).forEach((event) => {
       totalParticipants += Object.values(eventDetails[event]).filter((p) => p.trim() !== '').length;
     });
 
-    const calculatedAmount = totalParticipants * 10000; 
-    setTotalAmount(calculatedAmount); 
+    const calculatedAmount = totalParticipants * 10000;
+    setTotalAmount(calculatedAmount);
 
     const amount = calculatedAmount;
     const currency = "INR";
     const receiptId = "receiptId1";
 
-    const response = await fetch("http://localhost:5000/order", {
+    const response = await fetch("http://localhost:5088/order", {
       method: "POST",
       body: JSON.stringify({
         amount,
@@ -136,31 +138,31 @@ const Register = () => {
       course: formData.course,
       semester: formData.semester,
       transactionId: formData.transactionId,
-      events: Object.keys(events).filter(event => events[event]), 
+      events: Object.keys(events).filter(event => events[event]),
       eventDetails: Object.fromEntries(
-        Object.entries(eventDetails).filter(([event, participants]) => 
+        Object.entries(eventDetails).filter(([event, participants]) =>
           Object.values(participants).some(participant => participant.trim() !== '')
         )
       ),
-      totalAmount: calculatedAmount,
+      totalAmount: calculatedAmount / 100,
     };
-    
+
 
     var options = {
-      key: "rzp_test_y73boWxsFKNDJj", // Enter the Key ID generated from the Dashboard
-      amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+      key: "rzp_test_xjaCfVdnrPK2Q9", // Enter the Key ID generated from the Dashboard
+      amount, // Amount is in currency subunits. Default currency is INR. Hence, 50880 refers to 50880 paise
       currency,
       name: "Medha", //your business name
       description: "Test Transaction",
       image: "https://example.com/your_logo",
-      order_id: order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+      order_id: order.id, //This is a sample Order ID. Pass the id obtained in the response of Step 1
       handler: async function (response) {
         const body = {
           ...response,
         };
 
         const validateRes = await fetch(
-          "http://localhost:5000/order/validate",
+          "http://localhost:5088/order/validate",
           {
             method: "POST",
             body: JSON.stringify(body),
@@ -170,9 +172,19 @@ const Register = () => {
           }
         );
         const jsonRes = await validateRes.json();
-        if(jsonRes.msg === 'success') {
+        if (jsonRes.msg === 'success') {
           setPaymentSucces(true);
+          setRegisteredDetails(registrationData);
           console.log('Payment Successful', registrationData);
+
+          // Send registration data to the backend
+          const registerRes = await fetch("http://localhost:5088/register", {
+            method: "POST",
+            body: JSON.stringify(registrationData),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
         }
         console.log(jsonRes);
       },
@@ -205,21 +217,21 @@ const Register = () => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); 
-    
+    event.preventDefault();
+
     if (!validateForm()) {
       console.log('Form validation failed');
       return;
     }
-  
+
     let totalParticipants = 0;
     Object.keys(eventDetails).forEach((event) => {
       totalParticipants += Object.values(eventDetails[event]).filter((p) => p.trim() !== '').length;
     });
-  
-    const calculatedAmount = totalParticipants * 100; 
-    setTotalAmount(calculatedAmount); 
-  
+
+    const calculatedAmount = totalParticipants * 100;
+    setTotalAmount(calculatedAmount);
+
     const registrationData = {
       name: formData.name,
       phone: formData.phone,
@@ -227,28 +239,28 @@ const Register = () => {
       course: formData.course,
       semester: formData.semester,
       transactionId: formData.transactionId,
-      events: Object.keys(events).filter(event => events[event]), 
+      events: Object.keys(events).filter(event => events[event]),
       eventDetails: eventDetails,
       totalAmount: calculatedAmount,
     };
-  
-    
+
+
 
     try {
-      const response = await axios('http://localhost:5000/order', {
+      const response = await axios('http://localhost:5088/order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(registrationData)
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         alert('Registration Successful!');
         console.log('Server Response:', data);
-  
+
         setFormData({
           name: '',
           phone: '',
@@ -257,7 +269,7 @@ const Register = () => {
           semester: '',
           transactionId: '',
         });
-  
+
         setEvents({
           coding: false,
           webDesigning: false,
@@ -267,7 +279,7 @@ const Register = () => {
           itManager: false,
           reels: false,
         });
-  
+
         setEventDetails({
           coding: { participant1: '', participant2: '' },
           webDesigning: { participant1: '', participant2: '' },
@@ -277,9 +289,9 @@ const Register = () => {
           itManager: { participant1: '' },
           reels: { participant1: '', participant2: '' },
         });
-  
-        setTotalAmount(0); 
-  
+
+        setTotalAmount(0);
+
       } else {
         alert(`Registration failed: ${data.error}`);
         console.error('Error:', data);
@@ -289,14 +301,22 @@ const Register = () => {
       console.error('Network Error:', error);
     }
   };
-  
+
   const [totalAmount, setTotalAmount] = useState(0);
-  if(paymentSuccess) {
+  if (paymentSuccess) {
     return (
       <div className="register-container">
         <div className="register-card">
           <h1 className="register-title">Registration</h1>
           <h2>Payment Successful!</h2>
+          <ul>
+            {Object.entries(registeredDetails).map(([key, value]) => (
+              <li key={key}>
+                <strong>{key}:</strong>{" "}
+                {Array.isArray(value) ? value.join(", ") : String(value)}
+              </li>
+            ))}
+          </ul>
           <button onClick={() => setPaymentSucces(!paymentSuccess)}>Register more</button>
         </div>
       </div>
@@ -490,11 +510,11 @@ const Register = () => {
             ))}
           </div>
 
-          
+
 
           {/* Total Amount */}
           <div className="total-amount">
-            <strong>Total Amount: ₹{totalAmount/100}</strong>
+            <strong>Total Amount: ₹{totalAmount / 100}</strong>
           </div>
 
           {/* Pay Button */}
@@ -514,7 +534,7 @@ const Register = () => {
             <p>If any query, call: 65879585</p>
           </div>
 
-         
+
         </form>
       </div>
     </div>
